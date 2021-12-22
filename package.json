@@ -10,11 +10,16 @@
     "next": "latest",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "sass": "^1.45.0"
+    "react-loader-spinner": "^4.0.0",
+    "react-player": "^2.9.0",
+    "react-router-dom": "^6.1.1",
+    "sass": "^1.45.0",
+    "use-debounce": "^7.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.4",
     "tailwindcss": "^3.0.0"
-  }
+  },
+  "proxy": "https://google-search3.p.rapidapi.com"
 }
