@@ -13,6 +13,7 @@
     "react-loader-spinner": "^4.0.0",
     "react-player": "^2.9.0",
     "react-router-dom": "^6.1.1",
+    "react-scripts": "^5.0.0",
     "sass": "^1.45.0",
     "use-debounce": "^7.0.1"
   },

@@ -4,43 +4,26 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useDebounce } from "use-debounce";
 
+
 import { useState, useEffect, useCallback } from "react";
 
-const InputBox = ({ isHome = false, slug = null }) => {
-  const { setQuery, query, getResults, setResults } = useGlobalContext();
-  // const [text, setText] = useState("")
-  // const [value] = useDebounce(query, 800);
+const InputBox = ({ isHome = false }) => {
+  const { query, setQuery } = useGlobalContext()
 
   useEffect(() => {
-    const savedQuery = window.localStorage.getItem("query");
-    isHome ? setQuery("") : savedQuery && setQuery(savedQuery);
+    const cachedQuery = window.localStorage.getItem("query");
+    isHome ? setQuery("") : cachedQuery && setQuery(cachedQuery);
   }, []);
 
   const router = useRouter();
 
-  // const handleSearch = async () => {
-  //   const res = await fetch(`${baseUrl}/search/q=${query}&num=20&&lr=lang_en&hl=en&cr=US`,{
-  //     method: "GET",
-  //     headers: {
-  //       "x-user-agent": "desktop",
-  //       "x-rapidapi-host": "google-search3.p.rapidapi.com",
-  //       "x-rapidapi-key": process.env.NEXT_PUBLIC_RAPID_API_KEY,
-  //     },
-  //   });
-  //   const data = await res.json()
+  const { slug } = router.query
 
-  //   window.localStorage.setItem('query', query)
-
-  //   setResults(data.results);
-  //   router.push("/search")
-  // }
-  const handleSearch =  useCallback(() => {
-    // const res = await getResults(slug, query);
-
-    window.localStorage.setItem("query", query);
-
-    isHome? router.push(`/search/${query}`) : router.reload()
-  });
+  const handleSearch = () => {
+    isHome
+      ? window.localStorage.setItem("query", query) & router.push({ pathname: "/search", query: { q: query } })
+      : router.push({ pathname: `/${slug}`, query: { q: query } })
+  };
 
   const handleEnterKey = (e) => {
     if (e.key === "Enter") {
