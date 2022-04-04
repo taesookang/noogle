@@ -4,7 +4,7 @@ import { Router } from 'next/router'
 const GlobalContext = createContext();
 
 export function GlobalContextProvider({ children }) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState("");
 
