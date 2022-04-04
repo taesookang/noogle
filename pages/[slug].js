@@ -1,68 +1,36 @@
-import { useState, useEffect } from "react";
-import { useGlobalContext, getSearchResults } from "../services";
+import { useGlobalContext } from "../services";
 import {
   Layout,
   SearchRenderer,
   ImagesRenderer,
+  VideosRenderer,
   NewsRenderer,
+  NoResults,
+  Loading,
 } from "../components";
-import { useRouter, Router } from "next/router";
-import Link from "next/link";
+import { useRouter } from "next/router";
 
 const SearchPage = ({ results }) => {
-  // const [results, setResults] = useState([]);
-  // const { isLoading, setIsLoading } = useGlobalContext();
+  const { isLoading } = useGlobalContext();
   const router = useRouter();
   const { slug } = router.query;
-  const searchType = slug[0];
-  const searchTerm = slug[1];
 
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    const start = () => {
-      console.log("start");
-      setLoading(true);
-    };
-    const end = () => {
-      console.log("findished");
-      setLoading(false);
-    };
-    Router.events.on("routeChangeStart", start);
-    Router.events.on("routeChangeComplete", end);
-    Router.events.on("routeChangeError", end);
-    return () => {
-      Router.events.off("routeChangeStart", start);
-      Router.events.off("routeChangeComplete", end);
-      Router.events.off("routeChangeError", end);
-    };
-  }, []);
-  if (loading) {
-    return <h1>Loaidng</h1>;
+  console.log(results);
+
+  if (isLoading) {
+    return <Loading />;
   } else {
     switch (slug) {
       case "images":
-        return results ? (
-          <ImagesRenderer results={results} />
-        ) : (
-          <div>loading</div>
-        );
+        return results ? <ImagesRenderer results={results} /> : <NoResults />
 
       case "news":
-        return results ? (
-          <NewsRenderer results={results} />
-        ) : (
-          <div>loading</div>
-        );
+        return results ? <NewsRenderer results={results} /> : <NoResults />
 
       case "search":
-        return results ? (
-          <SearchRenderer results={results} />
-        ) : (
-          <div>loading</div>
-        );
-
-      default:
-        return <div>loading</div>;
+        return results ? <SearchRenderer results={results} /> : <NoResults />
+      case "videos": 
+       return results ? <VideosRenderer results={results} /> : <NoResults />
     }
   }
 };
@@ -72,22 +40,28 @@ SearchPage.getLayout = function getLayout(page) {
 };
 
 export async function getServerSideProps(context) {
+  const youtubeUrl = "https://youtube-search-results.p.rapidapi.com/youtube-search";
   const baseUrl = "https://google-search3.p.rapidapi.com/api/v1";
+
+  const { slug } = context.params;
+  const { q } = context.query;
+  const query = q.split(" ").join("+");
   const headers = {
     "x-user-agent": "desktop",
-    "x-rapidapi-host": "google-search3.p.rapidapi.com",
+    'x-proxy-location': 'US',
+    "x-rapidapi-host":
+      slug === "videos"
+        ? "youtube-search-results.p.rapidapi.com"
+        : "google-search3.p.rapidapi.com",
     "x-rapidapi-key": process.env.NEXT_PUBLIC_RAPID_API_KEY,
   };
-
-  const { slug, q } = context.query;
-  const query = q.split(" ").join("+");
 
   let data = null;
 
   switch (slug) {
     case "search":
       data = await fetch(
-        `${baseUrl}/search/q=${query}&num=100&lr=lang_en&cr=US`,
+        `${baseUrl}/search/q=${query}&num=50&lr=lang_en&cr=US`,
         {
           method: "GET",
           headers: headers,
@@ -102,7 +76,7 @@ export async function getServerSideProps(context) {
         },
       };
     case "news":
-      data = await fetch(`${baseUrl}/news/q=${query}&num=20&cied=US:en`, {
+      data = await fetch(`${baseUrl}/news/q=${query}&num=50&cied=US:en`, {
         method: "GET",
         headers: headers,
       })
@@ -115,7 +89,7 @@ export async function getServerSideProps(context) {
         },
       };
     case "images":
-      data = await fetch(`${baseUrl}/images/q=${query}`, {
+      data = await fetch(`${baseUrl}/image/q=${query}`, {
         method: "GET",
         headers: headers,
       })
@@ -127,6 +101,20 @@ export async function getServerSideProps(context) {
           results: data.image_results,
         },
       };
+    case "videos":
+      data = await fetch(`${youtubeUrl}/?q=${query}`, {
+        method: "GET",
+        headers: headers,
+      })
+        .then((res) => res.json())
+        .catch((err) => console.log(err));
+
+      return {
+        props: {
+          results: data.items,
+        },
+      };
+
     default:
       return {
         props: {

@@ -1,80 +1,44 @@
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, useEffect, createContext, useContext } from "react";
+import { Router } from 'next/router'
 
 const GlobalContext = createContext();
-const baseUrl = "https://google-search3.p.rapidapi.com/api/v1";
-const headers = {
-  "x-user-agent": "desktop",
-  "x-rapidapi-host": "google-search3.p.rapidapi.com",
-  "x-rapidapi-key": process.env.NEXT_PUBLIC_RAPID_API_KEY,
-};
 
 export function GlobalContextProvider({ children }) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [selected, setSelected] = useState("Search");
+  const [selected, setSelected] = useState("");
 
-  /*
-  / => home
-  /search/[slug] => search
-  /search/images/[slug] => images
-  /search/news/[slug] => news
-  */
-
-  const getSearchResults = async (category, searchTerm) => {
-    setIsLoading(true);
-    const res = await fetch(
-      `${baseUrl}/${category}/q=${searchTerm}&num=20&&lr=lang_en&hl=en&cr=US`,
-      {
-        method: "GET",
-        headers: headers,
-      }
-    );
-    const data = await res.json();
-
-    setIsLoading(false);
-
-    switch (category) {
-      case "images":
-        return data.image_results;
-
-        case "news":
-          return data.entries;
-
-      default:
-        return data.results;
+  useEffect(() => {
+    const cachedSelected = window.localStorage.getItem("selected");
+    if (cachedSelected) {
+      setSelected(cachedSelected);
     }
-  };
-  const getImageResults = async (searchTerm) => {
-    setIsLoading(true);
-    const res = await fetch(`/api/search/images/${searchTerm}`);
-    const data = await res.json();
-    setIsLoading(false);
+  }, []);
 
-    return data.image_results;
-  };
-  const getNewsResults = async (searchTerm) => {
-    setIsLoading(true);
-    const response = await fetch(`/api/search/news/${searchTerm}`);
-    const data = await response.json();
-    setIsLoading(false);
-
-    return data.entries;
-  };
+  useEffect(() => {
+    const start = () => {
+      setIsLoading(true);
+    };
+    const end = () => {
+      setIsLoading(false);
+    };
+    Router.events.on("routeChangeStart", start);
+    Router.events.on("routeChangeComplete", end);
+    Router.events.on("routeChangeError", end);
+    return () => {
+      Router.events.off("routeChangeStart", start);
+      Router.events.off("routeChangeComplete", end);
+      Router.events.off("routeChangeError", end);
+    };
+  }, []);
 
   return (
     <GlobalContext.Provider
       value={{
         query,
         setQuery,
-        // getResults,
         isLoading,
         setIsLoading,
-        results,
-        getSearchResults,
-        getImageResults,
-        getNewsResults,
-        setResults,
         setSelected,
         selected,
       }}

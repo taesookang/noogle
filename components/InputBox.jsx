@@ -1,14 +1,10 @@
+import {useEffect } from "react";
 import { SearchIcon } from "@heroicons/react/outline";
-import { useGlobalContext, baseUrl } from "../services";
+import { useGlobalContext } from "../services";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import { useDebounce } from "use-debounce";
-
-
-import { useState, useEffect, useCallback } from "react";
 
 const InputBox = ({ isHome = false }) => {
-  const { query, setQuery } = useGlobalContext()
+  const { query, setQuery, setSelected } = useGlobalContext();
 
   useEffect(() => {
     const cachedQuery = window.localStorage.getItem("query");
@@ -17,12 +13,14 @@ const InputBox = ({ isHome = false }) => {
 
   const router = useRouter();
 
-  const { slug } = router.query
+  const { slug } = router.query;
 
   const handleSearch = () => {
     isHome
-      ? window.localStorage.setItem("query", query) & router.push({ pathname: "/search", query: { q: query } })
-      : router.push({ pathname: `/${slug}`, query: { q: query } })
+      ? window.localStorage.setItem("query", query) &
+        setSelected("search") &
+        router.push({ pathname: "/search", query: { q: query } })
+      : router.push({ pathname: `/${slug}`, query: { q: query } });
   };
 
   const handleEnterKey = (e) => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/router";
 
 import {
@@ -17,7 +17,7 @@ const links = [
     icon: <PhotographIcon className="w-4 h-4" />,
   },
   {
-    url: "/search",
+    url: "/videos",
     text: "videos",
     icon: <VideoCameraIcon className="w-4 h-4" />,
   },
@@ -25,9 +25,7 @@ const links = [
 
 const NavBar = () => {
   const router = useRouter();
-  const { query } = useGlobalContext()
-
-  const { slug } = router.query
+  const { query, selected, setSelected } = useGlobalContext();
 
   return (
     <div className="border-b border-gray-200">
@@ -35,13 +33,17 @@ const NavBar = () => {
         {links.map((link, index) => (
           <li
             className={`text-gray-500 text-sm p-2 ${
-              slug === link.text && "border-b-2 border-blue-500"
+              selected === link.text && "border-b-2 border-blue-500"
             }`}
             key={index}
           >
             <button
               className="flex items-center mr-2"
-              onClick={() =>{ router.push(link.url + "/" + query)}}
+              onClick={() => {
+                setSelected(link.text),
+                  window.localStorage.setItem("selected", link.text),
+                  router.push({ pathname: link.url, query: { q: query } });
+              }}
             >
               {link.icon}
               <span className="ml-1 ">{link.text}</span>

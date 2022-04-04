@@ -1,13 +1,17 @@
 import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
 import InputBox from "../components/InputBox";
 import Logo from "../components/Logo";
-
+import { useGlobalContext } from "../services";
+import { Layout, Loading } from '../components'
 
 export default function Home() {
+  const { isLoading } = useGlobalContext();
 
-  return (
+  return isLoading ? (
+    <Layout>
+      <Loading />
+    </Layout>
+  ) : (
     <div className="container mx-auto">
       <Head>
         <title>Noogle</title>
