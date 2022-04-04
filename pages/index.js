@@ -2,7 +2,7 @@ import Head from "next/head";
 import InputBox from "../components/InputBox";
 import Logo from "../components/Logo";
 import { useGlobalContext } from "../services";
-import { Layout, Loading } from '../components'
+import { Layout, Loading } from "../components";
 
 export default function Home() {
   const { isLoading } = useGlobalContext();
@@ -15,6 +15,7 @@ export default function Home() {
     <div className="container mx-auto">
       <Head>
         <title>Noogle</title>
+        <meta property="og:title" content="Noogle" key="title" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-screen justify-center items-center flex-col">

@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 const ImagesRenderer = ({ results }) => {
   return (
+    <>
     <div className="flex flex-wrap justify-center sm:justify-start mt-4">
       {results &&
         results.map((result, index) => (
@@ -28,6 +29,7 @@ const ImagesRenderer = ({ results }) => {
           </div>
         ))}
     </div>
+    </>
   );
 };
 

@@ -15,14 +15,12 @@ const SearchPage = ({ results }) => {
   const router = useRouter();
   const { slug } = router.query;
 
-  console.log(results);
-
   if (isLoading) {
     return <Loading />;
   } else {
     switch (slug) {
       case "images":
-        return results ? <ImagesRenderer results={results} /> : <NoResults />
+        return results ?<ImagesRenderer results={results} /> : <NoResults />
 
       case "news":
         return results ? <NewsRenderer results={results} /> : <NoResults />
